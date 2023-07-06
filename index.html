@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tenzies</title>
+
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      .main {
+        background: #000;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        height: 100%;
+        width: 100%;
+      }
+
+      .content {
+        background: #fff;
+        border-radius: 30px;
+        padding: 25px;
+        text-align: center;
+      }
+      .content .title {
+        font-size: 32px;
+        line-height: 42px;
+        font-weight: 800;
+        margin-bottom: 15px;
+      }
+      p {
+        font-size: 18px;
+        line-height: 24px;
+        text-align: center;
+      }
+      .content .boxdice {
+        margin-top: 15px;
+        display: none;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+      }
+      .content .boxdice span {
+        height: 50px;
+        width: 50px;
+        margin: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 24px;
+        font-size: 24px;
+        font-weight: 800;
+        box-shadow: 1px 1px 6px #0005;
+        border-radius: 5px;
+        user-select: none;
+      }
+      .roll,
+      .new,
+      .start {
+        padding: 10px 25px;
+        border-radius: 5px;
+        box-shadow: 1px 1px 6px #0005;
+        background: #532ef7;
+        color: #fff;
+        width: fit-content;
+        margin: 15px 15px auto;
+        cursor: pointer;
+        outline: none;
+        border-color: transparent;
+      }
+      .roll {
+        display: none;
+      }
+      .startgame {
+        display: flex;
+        margin: 15px auto;
+        align-items: center;
+        justify-content: center;
+        flex-flow: column;
+      }
+      .startgame label {
+        font-size: 20px;
+        line-height: 26px;
+        font-weight: 600;
+        margin-bottom: 15px;
+      }
+      .startgame input {
+        appearance: none;
+        height: 60px;
+        width: 100px;
+        outline: none;
+        border: 2px solid #63e395;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        text-align: center;
+      }
+      .new {
+        margin: 15px auto;
+        display: none;
+      }
+      .hold {
+        background: #63e395;
+      }
+      .error{
+        color: red;
+        margin: 15px auto auto;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="content">
+        <div class="title">Tenzies</div>
+        <p class="score">
+          Roll until all dice are the same. Click each die to freeze it at its
+          current value between rolls.
+        </p>
+
+        <div class="startgame">
+          <label>Enter The Number of Box</label>
+          <input type="number" class="boxcount" min="4" max="100" />
+
+          <div class="error">Please Enter Number between 4 to 100</div>
+          <button class="start">Start</button>
+        </div>
+
+        <div class="boxdice">
+        </div>
+
+        <button class="roll">Roll</button>
+        <button class="new">New Game</button>
+      </div>
+    </div>
+
+    <script>
+      let title = document.querySelector(".title");
+      let boxdice = document.querySelector(".boxdice");
+      let roll = document.querySelector(".roll");
+      let score = document.querySelector(".score");
+      let startbox = document.querySelector(".startgame");
+      let newgame = document.querySelector(".new");
+      let startgame = document.querySelector(".start");
+      let boxcount = document.querySelector(".boxcount");
+      let error = document.querySelector(".error");
+
+
+      startgame.addEventListener("click", () => {
+     
+        if (boxcount.value >= 4 && boxcount.value <= 100 ) {
+          boxdice.style.display = "flex";
+          roll.style.display = "inline";
+          newgame.style.display = "inline";
+          startbox.style.display = "none";
+          boxfun();
+        }
+
+        else{
+            error.style.display = "block";
+        }
+     
+
+      });
+
+      function boxfun() {
+        let data;
+        let clickCount = 0;
+
+        for (let i = 0; i < boxcount.value; i++) {
+          data = Math.floor(Math.random() * 6 + 1);
+          boxdice.innerHTML += "<span>" + data + "</span>";
+        }
+
+        // =====================================================
+
+        let span = document.querySelectorAll("span");
+
+        for (let i = 0; i < span.length; i++) {
+        span[i].addEventListener("click", () => {
+          let hold = document.querySelectorAll(".hold");
+
+          if (hold.length == 0) {
+            span[i].classList.add("hold");
+          }
+
+          if (hold.length > 0) {
+            if (hold[0].innerText == span[i].innerText) {
+              span[i].classList.add("hold");
+
+              winfunction();
+            }
+          }
+        });
+      }
+
+      roll.addEventListener("click", () => {       
+
+        for (let i = 0; i < span.length; i++) {
+          data = Math.floor(Math.random() * 6 + 1);
+          if (!span[i].classList.contains("hold")) {
+            span[i].innerText = data;
+          }
+        }
+        clickCount++;
+        score.innerHTML = "<b>Score: </b>" + clickCount;
+      });
+
+
+      function winfunction() {
+        let hold = document.querySelectorAll(".hold");
+        if (span.length == hold.length) {
+          title.innerText = "Finished 🥳";
+          roll.disabled = "true";
+          newgame.style.display = "block";
+        }
+      }
+
+      newgame.addEventListener("click", () => {
+        location.reload();
+      });
+
+        // ===================================================
+
+      }
+
+
+
+
+   
+    </script>
+  </body>
+</html>
